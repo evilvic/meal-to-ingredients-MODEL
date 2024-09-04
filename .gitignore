@@ -1,0 +1,16 @@
+# Ignore Python virtual environments
+env/
+.env/
+meal_to_ingredients_env/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore any VSCode or PyCharm project settings
+.vscode/
+.idea/
+
+# Ignore logs and temporary files
+*.log
+*.tmp
