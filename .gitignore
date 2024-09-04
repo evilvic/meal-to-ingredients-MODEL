@@ -14,3 +14,9 @@ __pycache__/
 # Ignore logs and temporary files
 *.log
 *.tmp
+
+# Ignore DVC cache directory (optional)
+.dvc/cache/
+
+# Ignore any other large files that should be tracked by DVC instead of Git
+dataset/
