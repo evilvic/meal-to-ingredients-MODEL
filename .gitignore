@@ -21,3 +21,5 @@ __pycache__/
 # Ignore the dataset directory except for .dvc files
 dataset/*
 !dataset/*.dvc
+/results
+/model_output

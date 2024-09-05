@@ -2,8 +2,8 @@ from transformers import Trainer, TrainingArguments, AutoModelForTokenClassifica
 from datasets import load_dataset
 
 # Load the dataset
-train_dataset = load_dataset('json', data_files='dataset/train_fixed.json')['train']
-val_dataset = load_dataset('json', data_files='dataset/valid_fixed.json')['train']
+train_dataset = load_dataset('json', data_files='dataset/train_transformed.json')['train']
+val_dataset = load_dataset('json', data_files='dataset/valid_transformed.json')['train']
 
 # Load the tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
@@ -11,10 +11,10 @@ model = AutoModelForTokenClassification.from_pretrained("distilbert-base-uncased
 
 # Define a function to align labels with tokens
 def tokenize_and_align_labels(examples):
-    tokenized_inputs = tokenizer(examples['ingredients'], truncation=True, padding='max_length')
-    
+    tokenized_inputs = tokenizer(examples['sentence'], truncation=True, padding='max_length')
+
     labels = []
-    for i, label in enumerate(examples['ingredients_entities']):
+    for i, label_set in enumerate(examples['labels']):
         word_ids = tokenized_inputs.word_ids(batch_index=i)  # Map tokens to words in original text
         label_ids = []
         previous_word_idx = None
@@ -22,18 +22,16 @@ def tokenize_and_align_labels(examples):
             if word_idx is None:
                 label_ids.append(-100)  # Special tokens like [CLS], [SEP], etc.
             elif word_idx != previous_word_idx:  # New word
-                if word_idx < len(label):
-                    # Convert label type to an integer representing the class index
-                    class_index = label[word_idx]['type']
-                    if class_index == 'QUANTITY':
-                        label_ids.append(0)  # Assuming 0 is the index for QUANTITY
-                    elif class_index == 'UNIT':
-                        label_ids.append(1)  # Assuming 1 is the index for UNIT
-                    elif class_index == 'FOOD':
-                        label_ids.append(2)  # Assuming 2 is the index for FOOD
-                    # Add more elif cases if you have more classes
+                if word_idx < len(label_set):
+                    label = label_set[word_idx]['label']
+                    if label == "B-QUANTITY":
+                        label_ids.append(0)
+                    elif label == "B-UNIT":
+                        label_ids.append(1)
+                    elif label == "B-FOOD":
+                        label_ids.append(2)
                     else:
-                        label_ids.append(-100)  # If an unknown label, ignore
+                        label_ids.append(-100)  # If label is unknown, ignore it
                 else:
                     label_ids.append(-100)  # If word_idx is out of label's range
             else:
@@ -44,9 +42,6 @@ def tokenize_and_align_labels(examples):
 
     tokenized_inputs["labels"] = labels
 
-    # Debugging: print the structure of the processed example
-    print(f"Processed inputs: {tokenized_inputs}")
-    
     return tokenized_inputs
 
 # Tokenize and align labels for the dataset

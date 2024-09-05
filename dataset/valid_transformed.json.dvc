@@ -1,0 +1,5 @@
+outs:
+- md5: b93237571ed279d2625bc322dff22a6c
+  size: 27724
+  hash: md5
+  path: valid_transformed.json

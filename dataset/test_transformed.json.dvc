@@ -1,0 +1,5 @@
+outs:
+- md5: f8029e3ca59f9b421d09edf469548454
+  size: 27015
+  hash: md5
+  path: test_transformed.json
